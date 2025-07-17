@@ -1,0 +1,33 @@
+name: Lint, Test, and Deploy to Netlify
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run ESLint
+        run: npx eslint . --max-warnings=0
+
+      - name: Run Tests
+        run: npm test -- --watchAll=false
+
+      - name: Deploy to Netlify
+        run: |
+          npm install -g netlify-cli
+          netlify deploy --prod --dir=build --auth ${{ secrets.NETLIFY_AUTH_TOKEN }} --site ${{ secrets.NETLIFY_SITE_ID }}
